@@ -19,19 +19,24 @@ CREATE TABLE customers (
                            phone VARCHAR(20) NOT NULL UNIQUE COMMENT '手机号',
                            gender ENUM('男', '女') NOT NULL DEFAULT '男' COMMENT '性别',
                            address VARCHAR(200) COMMENT '地址',
+                           password VARCHAR(255) NOT NULL DEFAULT '123456' COMMENT '密码（默认123456）',
+                           role ENUM('customer', 'admin') NOT NULL DEFAULT 'customer' COMMENT '角色：customer-顾客，admin-管理员',
                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
-                           CONSTRAINT chk_gender CHECK (gender IN ('男', '女'))
+                           CONSTRAINT chk_gender CHECK (gender IN ('男', '女')),
+                           INDEX idx_name (name),
+                           INDEX idx_role (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='顾客表';
 
--- 插入顾客数据（7行）
-INSERT INTO customers (name, phone, gender, address, created_at) VALUES
-                                                                     ('张三', '13800138001', '男', '北京市朝阳区建国路100号', '2025-01-15 10:30:00'),
-                                                                     ('李四', '13800138002', '女', '上海市浦东新区陆家嘴200号', '2024-02-20 14:20:00'),
-                                                                     ('王五', '13800138003', '男', '广州市天河区体育西路300号', '2023-03-10 09:15:00'),
-                                                                     ('赵敏', '13800138004', '女', '深圳市南山区科技园400号', '2024-04-05 16:45:00'),
-                                                                     ('陈伟', '13800138005', '男', '杭州市西湖区文三路500号', '2025-05-12 11:30:00'),
-                                                                     ('刘芳', '13800138006', '女', '成都市武侯区人民南路600号', '2024-06-18 13:20:00'),
-                                                                     ('孙强', '13800138007', '男', '南京市鼓楼区中山北路700号', '2025-07-22 15:50:00');
+-- 插入顾客数据（8行）
+INSERT INTO customers (name, phone, gender, address, password, role, created_at) VALUES
+                                                                     ('张三', '13800138001', '男', '北京市朝阳区建国路100号', '123456', 'customer', '2025-01-15 10:30:00'),
+                                                                     ('李四', '13800138002', '女', '上海市浦东新区陆家嘴200号', '123456', 'customer', '2024-02-20 14:20:00'),
+                                                                     ('王五', '13800138003', '男', '广州市天河区体育西路300号', '123456', 'customer', '2023-03-10 09:15:00'),
+                                                                     ('赵敏', '13800138004', '女', '深圳市南山区科技园400号', '123456', 'customer', '2024-04-05 16:45:00'),
+                                                                     ('陈伟', '13800138005', '男', '杭州市西湖区文三路500号', '123456', 'customer', '2025-05-12 11:30:00'),
+                                                                     ('刘芳', '13800138006', '女', '成都市武侯区人民南路600号', '123456', 'customer', '2024-06-18 13:20:00'),
+                                                                     ('孙强', '13800138007', '男', '南京市鼓楼区中山北路700号', '123456', 'customer', '2025-07-22 15:50:00'),
+                                                                     ('root', 'root', '男', '系统管理', 'root', 'admin', NOW());
 
 -- ============================================
 -- 2. 供应商表 (suppliers)
