@@ -17,9 +17,18 @@
           <router-link to="/my-orders" class="nav-link">
             <span>📋</span> 我的订单
           </router-link>
-          <router-link to="/admin" class="nav-link admin-link">
-            <span>⚙️</span> 后台管理
-          </router-link>
+          <template v-if="currentUser">
+            <span class="nav-link user-info">👤 {{ currentUser.name }}</span>
+            <a class="nav-link logout-link" @click="handleLogout">退出</a>
+            <router-link v-if="currentUser.role === 'admin'" to="/admin" class="nav-link admin-link">
+              <span>⚙️</span> 后台管理
+            </router-link>
+          </template>
+          <template v-else>
+            <router-link to="/login" class="nav-link login-link">
+              <span>🔑</span> 登录
+            </router-link>
+          </template>
         </nav>
       </div>
     </header>
@@ -38,7 +47,34 @@
 
 <script>
 export default {
-  name: 'CustomerLayout'
+  name: 'CustomerLayout',
+  data() {
+    return {
+      currentUser: null
+    }
+  },
+  created() {
+    this.loadUser()
+  },
+  watch: {
+    // 监听路由变化，刷新用户信息
+    '$route'() {
+      this.loadUser()
+    }
+  },
+  methods: {
+    loadUser() {
+      const user = JSON.parse(localStorage.getItem('currentUser') || 'null')
+      this.currentUser = user
+    },
+    handleLogout() {
+      if (confirm('确定要退出登录吗？')) {
+        localStorage.removeItem('currentUser')
+        this.currentUser = null
+        this.$router.push('/login')
+      }
+    }
+  }
 }
 </script>
 
@@ -108,6 +144,25 @@ export default {
 }
 
 .admin-link {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.user-info {
+  cursor: default;
+  font-weight: bold;
+}
+
+.logout-link {
+  cursor: pointer;
+  color: #ffcdd2;
+}
+
+.logout-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.login-link {
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 

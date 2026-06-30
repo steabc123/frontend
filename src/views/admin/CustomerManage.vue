@@ -61,6 +61,10 @@
           <label>地址:</label>
           <input v-model="form.address" type="text" class="form-input" placeholder="请输入地址" />
         </div>
+        <div v-if="isEdit" class="form-group">
+          <label>修改密码:</label>
+          <input v-model="form.password" type="text" class="form-input" placeholder="留空则不修改密码" />
+        </div>
         <div class="dialog-actions">
           <button class="btn btn-cancel" @click="closeDialog">取消</button>
           <button class="btn btn-primary" :disabled="submitting" @click="handleSubmit">
@@ -73,7 +77,7 @@
 </template>
 
 <script>
-import { getCustomerList, addCustomer, updateCustomer, deleteCustomer } from '@/api/customer'
+import { getCustomerList, addCustomer, updateCustomer, deleteCustomer, updateCustomerPassword } from '@/api/customer'
 
 export default {
   name: 'CustomerManage',
@@ -85,7 +89,7 @@ export default {
       isEdit: false,
       editId: null,
       submitting: false,
-      form: { name: '', phone: '', gender: '男', address: '' }
+      form: { name: '', phone: '', gender: '男', address: '', password: '' }
     }
   },
   created() {
@@ -111,7 +115,7 @@ export default {
       } else {
         this.isEdit = false
         this.editId = null
-        this.form = { name: '', phone: '', gender: '男', address: '' }
+        this.form = { name: '', phone: '', gender: '男', address: '', password: '' }
       }
       this.showDialog = true
     },
@@ -123,7 +127,14 @@ export default {
       this.submitting = true
       try {
         if (this.isEdit) {
-          await updateCustomer(this.editId, this.form)
+          // 先更新基本信息
+          const { password, ...basicInfo } = this.form
+          await updateCustomer(this.editId, basicInfo)
+          
+          // 如果填写了密码，则更新密码
+          if (password && password.trim()) {
+            await updateCustomerPassword(this.editId, password)
+          }
         } else {
           await addCustomer(this.form)
         }

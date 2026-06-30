@@ -37,6 +37,10 @@
     <div class="main-wrapper">
       <header class="admin-header">
         <h2 class="page-title">{{ $route.meta.title || '管理后台' }}</h2>
+        <div class="header-right">
+          <span class="admin-name">👤 {{ currentUser?.name || '管理员' }}</span>
+          <button class="btn-logout" @click="handleLogout">退出登录</button>
+        </div>
       </header>
       <main class="admin-content">
         <router-view />
@@ -47,7 +51,27 @@
 
 <script>
 export default {
-  name: 'AdminLayout'
+  name: 'AdminLayout',
+  data() {
+    return {
+      currentUser: null
+    }
+  },
+  created() {
+    this.loadUser()
+  },
+  methods: {
+    loadUser() {
+      const user = JSON.parse(localStorage.getItem('currentUser') || 'null')
+      this.currentUser = user
+    },
+    handleLogout() {
+      if (confirm('确定要退出登录吗？')) {
+        localStorage.removeItem('currentUser')
+        this.$router.push('/login')
+      }
+    }
+  }
 }
 </script>
 
@@ -148,6 +172,37 @@ export default {
   position: sticky;
   top: 0;
   z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-name {
+  font-size: 14px;
+  color: #555;
+}
+
+.btn-logout {
+  padding: 6px 16px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: #e53935;
+  color: white;
+  border-color: #e53935;
 }
 
 .page-title {

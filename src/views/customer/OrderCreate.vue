@@ -4,24 +4,17 @@
 
     <!-- 步骤提示 -->
     <div class="steps">
-      <div class="step active">1. 选择顾客</div>
-      <div class="step active">2. 添加商品</div>
-      <div class="step active">3. 确认下单</div>
+      <div class="step active">1. 添加商品</div>
+      <div class="step active">2. 确认信息</div>
+      <div class="step active">3. 提交下单</div>
     </div>
 
-    <!-- 顾客选择 -->
+    <!-- 当前用户信息 -->
     <div class="card">
-      <h3>选择顾客</h3>
-      <div class="form-row">
-        <select v-model="selectedCustomerId" class="form-select">
-          <option value="">-- 请选择顾客 --</option>
-          <option v-for="c in customers" :key="c.id" :value="c.id">
-            {{ c.name }} ({{ c.phone }})
-          </option>
-        </select>
-      </div>
-      <div v-if="selectedCustomer" class="customer-info">
-        <span>📍 配送地址: {{ selectedCustomer.address }}</span>
+      <h3>收货信息</h3>
+      <div class="customer-info" v-if="currentUser">
+        <span>👤 {{ currentUser.name }}</span>
+        <span style="margin-left: 16px;">📱 {{ currentUser.phone }}</span>
       </div>
     </div>
 
@@ -109,7 +102,6 @@
 </template>
 
 <script>
-import { getCustomerList } from '@/api/customer'
 import { getFruitList } from '@/api/fruit'
 import { createOrder } from '@/api/order'
 
@@ -117,9 +109,8 @@ export default {
   name: 'OrderCreate',
   data() {
     return {
-      customers: [],
+      currentUser: null,
       fruits: [],
-      selectedCustomerId: '',
       selectedFruitId: '',
       quantity: 1,
       orderItems: [],
@@ -130,9 +121,6 @@ export default {
     }
   },
   computed: {
-    selectedCustomer() {
-      return this.customers.find(c => c.id === Number(this.selectedCustomerId))
-    },
     selectedFruit() {
       return this.fruits.find(f => f.id === Number(this.selectedFruitId))
     },
@@ -141,6 +129,15 @@ export default {
     }
   },
   created() {
+    // 检查登录状态
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null')
+    if (!user) {
+      alert('请先登录')
+      this.$router.push('/login')
+      return
+    }
+    this.currentUser = user
+    this.deliveryAddress = user.address || ''
     this.loadData()
     // 从首页跳转过来时预选水果
     if (this.$route.query.fruitId) {
@@ -150,16 +147,8 @@ export default {
   methods: {
     async loadData() {
       try {
-        const [custRes, fruitRes] = await Promise.all([
-          getCustomerList(),
-          getFruitList()
-        ])
-        this.customers = custRes.data || []
+        const fruitRes = await getFruitList()
         this.fruits = fruitRes.data || []
-        // 如果地址来自选中顾客，自动填充
-        if (this.selectedCustomer) {
-          this.deliveryAddress = this.selectedCustomer.address
-        }
       } catch (e) {
         console.error('加载数据失败:', e)
       }
@@ -184,19 +173,18 @@ export default {
       this.orderItems.splice(index, 1)
     },
     async submitOrder() {
-      if (!this.selectedCustomerId) return alert('请选择顾客')
+      if (!this.currentUser) return alert('请先登录')
       if (this.orderItems.length === 0) return alert('请添加商品')
 
       this.submitting = true
       try {
-        const address = this.deliveryAddress || (this.selectedCustomer ? this.selectedCustomer.address : '')
         const orderData = {
           order: {
-            customerId: Number(this.selectedCustomerId),
+            customerId: Number(this.currentUser.id),
             totalAmount: String(this.totalAmount.toFixed(2)),
             status: '待支付',
             paymentMethod: this.paymentMethod || null,
-            deliveryAddress: address
+            deliveryAddress: this.deliveryAddress || this.currentUser.address || ''
           },
           items: this.orderItems.map(item => ({
             fruitId: item.fruitId,
@@ -220,13 +208,7 @@ export default {
       this.showSuccess = false
     }
   },
-  watch: {
-    selectedCustomerId() {
-      if (this.selectedCustomer) {
-        this.deliveryAddress = this.selectedCustomer.address
-      }
-    }
-  }
+
 }
 </script>
 

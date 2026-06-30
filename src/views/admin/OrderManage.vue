@@ -98,7 +98,7 @@
         <table v-else-if="orderItems.length > 0" class="data-table">
           <thead>
             <tr>
-              <th>水果ID</th>
+              <th>水果名称</th>
               <th>单价</th>
               <th>数量(斤)</th>
               <th>小计</th>
@@ -106,7 +106,7 @@
           </thead>
           <tbody>
             <tr v-for="item in orderItems" :key="item.id">
-              <td>{{ item.fruitId }}</td>
+              <td>{{ item.fruitName || '-' }}</td>
               <td>¥{{ item.unitPrice }}</td>
               <td>{{ item.quantity }}</td>
               <td class="amount">¥{{ item.subtotal }}</td>

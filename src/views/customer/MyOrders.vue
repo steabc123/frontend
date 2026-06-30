@@ -2,19 +2,6 @@
   <div class="my-orders-page">
     <h2 class="page-title">📋 我的订单</h2>
 
-    <!-- 顾客选择 -->
-    <div class="card">
-      <div class="select-row">
-        <label>选择顾客查看订单:</label>
-        <select v-model="selectedCustomerId" class="form-select" @change="loadOrders">
-          <option value="">-- 请选择顾客 --</option>
-          <option v-for="c in customers" :key="c.id" :value="c.id">
-            {{ c.name }} ({{ c.phone }})
-          </option>
-        </select>
-      </div>
-    </div>
-
     <!-- 加载状态 -->
     <div v-if="loading" class="loading">加载中...</div>
 
@@ -89,25 +76,20 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-else-if="selectedCustomerId" class="empty">
-      <p>该顾客暂无订单</p>
-    </div>
     <div v-else class="empty">
-      <p>请选择顾客查看订单</p>
+      <p>暂无订单</p>
     </div>
   </div>
 </template>
 
 <script>
-import { getCustomerList } from '@/api/customer'
 import { getOrdersByCustomerId, getOrderItems, updateOrderStatus } from '@/api/order'
 
 export default {
   name: 'MyOrders',
   data() {
     return {
-      customers: [],
-      selectedCustomerId: '',
+      currentUser: null,
       orders: [],
       loading: false,
       expandedOrder: null,
@@ -116,26 +98,23 @@ export default {
     }
   },
   created() {
-    this.loadCustomers()
+    // 检查登录状态
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null')
+    if (!user) {
+      alert('请先登录')
+      this.$router.push('/login')
+      return
+    }
+    this.currentUser = user
+    this.loadOrders()
   },
   methods: {
-    async loadCustomers() {
-      try {
-        const res = await getCustomerList()
-        this.customers = res.data || []
-      } catch (e) {
-        console.error('加载顾客失败:', e)
-      }
-    },
     async loadOrders() {
-      if (!this.selectedCustomerId) {
-        this.orders = []
-        return
-      }
+      if (!this.currentUser) return
       this.loading = true
       this.expandedOrder = null
       try {
-        const res = await getOrdersByCustomerId(this.selectedCustomerId)
+        const res = await getOrdersByCustomerId(this.currentUser.id)
         this.orders = res.data || []
       } catch (e) {
         console.error('加载订单失败:', e)
@@ -195,34 +174,6 @@ export default {
   margin: 0 0 20px;
   font-size: 22px;
   color: #333;
-}
-
-.card {
-  background: white;
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
-}
-
-.select-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.select-row label {
-  font-size: 14px;
-  color: #555;
-  white-space: nowrap;
-}
-
-.form-select {
-  flex: 1;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
 }
 
 .loading, .empty {
