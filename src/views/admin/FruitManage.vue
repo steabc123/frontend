@@ -16,6 +16,7 @@
             <th>分类</th>
             <th>单价(元/斤)</th>
             <th>库存(斤)</th>
+            <th>供应商</th>
             <th>产地</th>
             <th>保质期(天)</th>
             <th>操作</th>
@@ -28,6 +29,7 @@
             <td><span class="tag">{{ fruit.category }}</span></td>
             <td class="price">¥{{ fruit.price }}</td>
             <td>{{ fruit.stockQuantity }}</td>
+            <td>{{ getSupplierName(fruit.supplierId) }}</td>
             <td>{{ fruit.origin }}</td>
             <td>{{ fruit.shelfLifeDays }}</td>
             <td>
@@ -61,8 +63,11 @@
           <input v-model.number="form.stockQuantity" type="number" class="form-input" />
         </div>
         <div class="form-group">
-          <label>供应商ID:</label>
-          <input v-model.number="form.supplierId" type="number" class="form-input" />
+          <label>供应商:</label>
+          <select v-model.number="form.supplierId" class="form-input">
+            <option :value="null">请选择供应商</option>
+            <option v-for="s in suppliers" :key="s.id" :value="s.id">{{ s.companyName }}</option>
+          </select>
         </div>
         <div class="form-group">
           <label>产地:</label>
@@ -85,12 +90,14 @@
 
 <script>
 import { getFruitList, addFruit, updateFruit, deleteFruit } from '@/api/fruit'
+import { getSupplierList } from '@/api/supplier'
 
 export default {
   name: 'FruitManage',
   data() {
     return {
       fruits: [],
+      suppliers: [],
       loading: true,
       showDialog: false,
       isEdit: false,
@@ -106,13 +113,22 @@ export default {
     async loadData() {
       try {
         this.loading = true
-        const res = await getFruitList()
-        this.fruits = res.data || []
+        const [fruitRes, supplierRes] = await Promise.all([
+          getFruitList().catch(e => { console.error('加载水果失败:', e); return null }),
+          getSupplierList().catch(e => { console.error('加载供应商失败:', e); return null })
+        ])
+        this.fruits = (fruitRes && fruitRes.data) || []
+        this.suppliers = (supplierRes && supplierRes.data) || []
       } catch (e) {
         console.error('加载失败:', e)
       } finally {
         this.loading = false
       }
+    },
+    getSupplierName(supplierId) {
+      if (supplierId === null || supplierId === undefined || supplierId === '') return '-'
+      const s = this.suppliers.find(item => item.id == supplierId)
+      return s ? s.companyName : '-'
     },
     openDialog(fruit) {
       if (fruit) {
