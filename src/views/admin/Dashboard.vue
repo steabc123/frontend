@@ -94,7 +94,10 @@ export default {
   },
   computed: {
     latestOrders() {
-      return this.orders.slice(-5).reverse()
+      // 按下单时间降序排序，取最新5条
+      return [...this.orders]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
     }
   },
   created() {
