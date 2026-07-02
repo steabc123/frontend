@@ -28,7 +28,9 @@
         :key="fruit.id"
         class="fruit-card"
       >
-        <div class="fruit-emoji">{{ getCategoryEmoji(fruit.category) }}</div>
+        <div class="fruit-image">
+          <img :src="getFruitImage(fruit.id)" :alt="fruit.name" />
+        </div>
         <div class="fruit-info">
           <h3 class="fruit-name">{{ fruit.name }}</h3>
           <p class="fruit-category">{{ fruit.category }}</p>
@@ -100,6 +102,21 @@ export default {
     },
     goToOrder(fruit) {
       this.$router.push({ path: '/order/create', query: { fruitId: fruit.id } })
+    },
+    getFruitImage(id) {
+      // 根据fruit.id映射到对应的图片文件
+      const imageMap = {
+        1: '1.jpg',
+        2: '2.jpg',
+        3: '3.jpg',
+        4: '4.jpg',
+        5: '5.jpg',
+        6: '6.jpg',
+        7: '7.jpg',
+        8: '8.jpg'
+      }
+      const imageName = imageMap[id] || '1.jpg' // 默认使用1.jpg
+      return `/img/${imageName}`
     }
   }
 }
@@ -180,11 +197,17 @@ export default {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.fruit-emoji {
-  font-size: 64px;
-  text-align: center;
-  padding: 24px 0 8px;
+.fruit-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
   background: #f8fdf8;
+}
+
+.fruit-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .fruit-info {
