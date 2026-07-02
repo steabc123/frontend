@@ -4,7 +4,7 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <span class="logo-icon">🍊</span>
-        <span class="logo-text">管理后台</span>
+        <span class="logo-text">水果店管理后台</span>
       </div>
       <nav class="sidebar-nav">
         <router-link to="/admin/dashboard" class="nav-item">

@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { getCustomerList, addCustomer, updateCustomer, deleteCustomer, updateCustomerPassword } from '@/api/customer'
+import { getCustomerList, addCustomer, updateCustomer, deleteCustomer, resetPassword } from '@/api/customer'
 
 export default {
   name: 'CustomerManage',
@@ -131,9 +131,9 @@ export default {
           const { password, ...basicInfo } = this.form
           await updateCustomer(this.editId, basicInfo)
           
-          // 如果填写了密码，则更新密码
+          // 如果填写了密码，则重置密码
           if (password && password.trim()) {
-            await updateCustomerPassword(this.editId, password)
+            await resetPassword(this.editId, password.trim())
           }
         } else {
           await addCustomer(this.form)

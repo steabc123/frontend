@@ -40,6 +40,11 @@ export function updateOrderStatus(orderId, status) {
   return request.put(`/api/order/${orderId}`, { status })
 }
 
+// 获取订单统计（各状态数量）
+export function getOrderStats(customerId) {
+  return request.get(`/api/order/customer/${customerId}/stats`)
+}
+
 // 删除订单
 export function deleteOrder(orderId) {
   return request.delete(`/api/order/${orderId}`)

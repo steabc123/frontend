@@ -40,7 +40,12 @@ export function deleteCustomer(id) {
   return request.delete(`/api/customer/${id}`)
 }
 
-// 修改顾客密码
-export function updateCustomerPassword(id, password) {
-  return request.put(`/api/customer/${id}/password`, { password })
+// 修改顾客密码（用户自己修改，需要旧密码）
+export function updateCustomerPassword(id, data) {
+  return request.put(`/api/customer/${id}/password`, data)
+}
+
+// 管理员重置密码（无需旧密码）
+export function resetPassword(id, newPassword) {
+  return request.put(`/api/customer/${id}/reset-password`, { newPassword })
 }

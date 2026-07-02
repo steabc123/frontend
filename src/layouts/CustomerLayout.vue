@@ -18,7 +18,7 @@
             <span>📋</span> 我的订单
           </router-link>
           <template v-if="currentUser">
-            <span class="nav-link user-info">👤 {{ currentUser.name }}</span>
+            <router-link to="/profile" class="nav-link user-link">👤 {{ currentUser.name }}</router-link>
             <a class="nav-link logout-link" @click="handleLogout">退出</a>
             <router-link v-if="currentUser.role === 'admin'" to="/admin" class="nav-link admin-link">
               <span>⚙️</span> 后台管理
@@ -147,9 +147,9 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.user-info {
-  cursor: default;
+.user-link {
   font-weight: bold;
+  cursor: pointer;
 }
 
 .logout-link {

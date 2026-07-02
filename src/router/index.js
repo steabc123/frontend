@@ -9,6 +9,7 @@ import AdminLayout from '../layouts/AdminLayout.vue'
 import CustomerHome from '../views/customer/Home.vue'
 import CustomerOrderCreate from '../views/customer/OrderCreate.vue'
 import CustomerMyOrders from '../views/customer/MyOrders.vue'
+import CustomerProfile from '../views/customer/Profile.vue'
 import CustomerLogin from '../views/customer/Login.vue'
 import CustomerRegister from '../views/customer/Register.vue'
 
@@ -31,7 +32,8 @@ const routes = [
     children: [
       { path: 'home', name: 'CustomerHome', component: CustomerHome, meta: { title: '水果商城' } },
       { path: 'order/create', name: 'OrderCreate', component: CustomerOrderCreate, meta: { title: '下单', requireAuth: true } },
-      { path: 'my-orders', name: 'MyOrders', component: CustomerMyOrders, meta: { title: '我的订单', requireAuth: true } }
+      { path: 'my-orders', name: 'MyOrders', component: CustomerMyOrders, meta: { title: '我的订单', requireAuth: true } },
+      { path: 'profile', name: 'Profile', component: CustomerProfile, meta: { title: '个人中心', requireAuth: true } }
     ]
   },
   {
