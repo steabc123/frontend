@@ -12,7 +12,7 @@
             <span>🏠</span> 首页
           </router-link>
           <router-link to="/order/create" class="nav-link">
-            <span>🛒</span> 下单
+            <span>🛒</span> 创建订单
           </router-link>
           <router-link to="/my-orders" class="nav-link">
             <span>📋</span> 我的订单
